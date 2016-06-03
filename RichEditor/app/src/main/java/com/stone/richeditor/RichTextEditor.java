@@ -21,6 +21,9 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.media.ExifInterface;
+
+import java.io.IOException;
 
 /**
  * 这是一个富文本编辑器，给外部提供insertImage接口，添加的图片跟当前光标所在位置有关
@@ -187,13 +190,44 @@ public class RichTextEditor extends ScrollView {
 		closeView.setOnClickListener(btnListener);
 		return layout;
 	}
+	
+	/**
+	* 修正照片旋转角度
+	* */
+	public void insertBitmap(String imagePath) {
+		try {
+			ExifInterface exif = new ExifInterface(imagePath);
+			int orienration = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION
+					, ExifInterface.ORIENTATION_NORMAL);
+			switch (orienration) {
+				case ExifInterface.ORIENTATION_ROTATE_90:
+					Log.i("get ori", "insertBitmap: orienration = 90");
+					insertImage(imagePath,90);
+					break;
+				case ExifInterface.ORIENTATION_ROTATE_180:
+					Log.i("get ori", "insertBitmap: orienration = 180");
+					insertImage(imagePath,180);
+					break;
+				case ExifInterface.ORIENTATION_ROTATE_270:
+					Log.i("get ori", "insertBitmap: orienration = 270");
+					insertImage(imagePath,270);
+					break;
+				default:
+					Log.i("get ori", "insertBitmap: default");
+					insertImage(imagePath,0);
+					break;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * 根据绝对路径添加view
 	 * 
 	 * @param imagePath
 	 */
-	public void insertImage(String imagePath) {
+	private void insertImage(String imagePath) {
 		Bitmap bmp = getScaledBitmap(imagePath, getWidth());
 		insertImage(bmp, imagePath);
 	}
