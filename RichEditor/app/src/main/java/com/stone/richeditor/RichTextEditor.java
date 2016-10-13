@@ -227,8 +227,8 @@ public class RichTextEditor extends ScrollView {
 	 * 
 	 * @param imagePath
 	 */
-	private void insertImage(String imagePath) {
-		Bitmap bmp = getScaledBitmap(imagePath, getWidth());
+	private void insertImage(String imagePath,int degree) {
+		Bitmap bmp = getScaledBitmap(imagePath, getWidth(),degree);
 		insertImage(bmp, imagePath);
 	}
 
@@ -321,7 +321,7 @@ public class RichTextEditor extends ScrollView {
 	 * @param width
 	 *            view的宽度
 	 */
-	private Bitmap getScaledBitmap(String filePath, int width) {
+	private Bitmap getScaledBitmap(String filePath, int width,int degree) {
 		BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inJustDecodeBounds = true;
 		BitmapFactory.decodeFile(filePath, options);
@@ -329,7 +329,12 @@ public class RichTextEditor extends ScrollView {
 				+ 1 : 1;
 		options.inJustDecodeBounds = false;
 		options.inSampleSize = sampleSize;
-		return BitmapFactory.decodeFile(filePath, options);
+		Bitmap bitmap = BitmapFactory.decodeFile(filePath, options);
+        	Matrix matrix = new Matrix();
+        	matrix.postRotate(degree);
+        	bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
+                	bitmap.getHeight(), matrix, true);
+		return bitmap;
 	}
 
 	/**
